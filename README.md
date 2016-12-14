@@ -2,9 +2,15 @@
 
 > pagination & datatable component for Vue.js
 
+# screenshot
+
+![screenshot](screenshot.png)
+
 # Requirements
 
 - [Vue.js](https://github.com/yyx990803/vue) `^1.0.0`
+
+- [vue-resource](https://github.com/pagekit/vue-resource) `^1.0.1` or whatever
 
 # Usage
 
@@ -21,19 +27,29 @@
   export default {
     data() {
       return {
-        size: 10,
-        total: 70,
         index: 1,
+        size: 5,
+        total: 0,
         length: 5,
-        options: [10, 20, 30]
+        options: [10, 20, 30],
+        tableData: []
       }
     },
     components: {
       Pagitable
     },
+    ready() {
+      this.getUsers()
+    },
     methods: {
-      changePage(index) {
+      changePage(index, size) {
         this.index = index
+        this.size = size
+        this.getUsers()
+      },
+      getUsers() {
+        // Get your data with this.index and this.size
+        // Don't forget to update this.total
       }
     }
   }
