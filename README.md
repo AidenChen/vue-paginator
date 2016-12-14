@@ -11,32 +11,32 @@
 ``` html
 <template>
   <pagitable :total="total" @change-page="changePage"></pagitable>
-  <pagitable :size="size" :total="total" :index="index" @change-page="changePage"></pagitable>
-  <pagitable :size="size" :total="total" :index="index" :options="options" :length="length" @change-page="changePage"></pagitable>
+  <pagitable :index="index" :size="size" :total="total" @change-page="changePage"></pagitable>
+  <pagitable :index="index" :size="size" :total="total" :length="length" :options="options" @change-page="changePage"></pagitable>
 </template>
 
 <script>
-import Pagitable from 'path/to/pagitable.vue'
+  import Pagitable from 'path/to/pagitable.vue'
 
-export default {
-  data() {
-    return {
-      size: 10,
-      total: 70,
-      index: 1,
-      length: 5,
-      options: [10, 20, 30]
-    }
-  },
-  components: {
-    Pagitable
-  },
-  methods: {
-    changePage(index) {
-      this.index = index
+  export default {
+    data() {
+      return {
+        size: 10,
+        total: 70,
+        index: 1,
+        length: 5,
+        options: [10, 20, 30]
+      }
+    },
+    components: {
+      Pagitable
+    },
+    methods: {
+      changePage(index) {
+        this.index = index
+      }
     }
   }
-}
 </script>
 ```
 

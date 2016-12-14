@@ -132,7 +132,7 @@
     watch: {
       optionNow() {
         this.init()
-        this.$emit('change-page', this.index)
+        this.$emit('change-page', this.index, parseInt(this.optionNow))
       }
     },
     created() {
@@ -154,6 +154,7 @@
           this.index = parseInt(index)
         }
         this.fixIndex()
+        this.$emit('change-page', this.index, parseInt(this.optionNow))
       },
       // 上一页
       prevPage() {
@@ -161,6 +162,7 @@
           this.index -= 1
         }
         this.targetIndex = this.index
+        this.$emit('change-page', this.index, parseInt(this.optionNow))
       },
       // 下一页
       nextPage() {
@@ -168,6 +170,7 @@
           this.index += 1
         }
         this.targetIndex = this.index
+        this.$emit('change-page', this.index, parseInt(this.optionNow))
       },
       // 输入页码跳转页面
       jumpToPage() {
@@ -180,7 +183,7 @@
       fixLength() {
         this.length = parseInt(this.length) ? parseInt(this.length) : 5
         if (this.length % 2 === 0) {
-          this.length = this.length - 1
+          this.length += 1
         }
       },
       // 修正分页索引

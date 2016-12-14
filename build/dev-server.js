@@ -14,6 +14,30 @@ var port = process.env.PORT || config.dev.port
 var proxyTable = config.dev.proxyTable
 
 var app = express()
+var data = require('../data.json')
+var total = data.total
+var items = data.items
+var apiRoutes = express.Router()
+apiRoutes.get('/users', function(req, res) {
+	var start = (req.query.index - 1) * req.query.size
+	var size = req.query.size
+	var limit = parseInt(start) + parseInt(size)
+	var arr = []
+	for (var i = start; i < limit; i++) {
+		if (items[i]) {
+			arr.push(items[i])
+		}
+	}
+	res.json({
+		code: 0,
+		msg: 'Request successful!',
+		data: {
+			total: total,
+			items: arr
+		}
+	})
+})
+app.use('/api', apiRoutes);
 var compiler = webpack(webpackConfig)
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
