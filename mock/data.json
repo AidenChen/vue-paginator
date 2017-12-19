@@ -1,6 +1,5 @@
 {
-  "total": 50,
-  "items": [
+  "users": [
     {
       "id": "1",
       "name": "user1",

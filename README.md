@@ -1,6 +1,6 @@
-# vue-pagitable
+# vue-paginator
 
-> pagination & datatable component for Vue.js
+> A Vue.js project
 
 # screenshot
 
@@ -8,21 +8,19 @@
 
 # Requirements
 
-- [Vue.js](https://github.com/yyx990803/vue) `^1.0.0`
-
-- [vue-resource](https://github.com/pagekit/vue-resource) `^1.0.1` or whatever
+- [Vue.js](https://github.com/yyx990803/vue) `^2.0.0`
 
 # Usage
 
 ``` html
 <template>
-  <pagitable :total="total" @change-page="changePage"></pagitable>
-  <pagitable :index="index" :size="size" :total="total" @change-page="changePage"></pagitable>
-  <pagitable :index="index" :size="size" :total="total" :length="length" :options="options" @change-page="changePage"></pagitable>
+  <paginator :total="total" @change-page="changePage"/>
+  <paginator :index="index" :size="size" :total="total" @change-page="changePage"/>
+  <paginator :index="index" :size="size" :total="total" :length="length" :options="options" @change-page="changePage"/>
 </template>
 
 <script>
-  import Pagitable from 'path/to/pagitable.vue'
+  import Paginator from 'path/to/Paginator.vue';
 
   export default {
     data() {
@@ -33,22 +31,22 @@
         length: 5,
         options: [10, 20, 30],
         tableData: []
-      }
+      };
     },
     components: {
-      Pagitable
+      Paginator
     },
-    ready() {
-      this.getUsers()
+    created() {
+      this.indexUser();
     },
     methods: {
       changePage(index, size) {
-        this.index = index
-        this.size = size
-        this.getUsers()
+        this.index = index;
+        this.size = size;
+        this.indexUser();
       },
-      getUsers() {
-        // Get your data with this.index and this.size
+      indexUser() {
+        // Fetch data with this.index and this.size
         // Don't forget to update this.total
       }
     }
@@ -62,11 +60,11 @@
 
 2. Clone this repo:
 
-  git clone https://github.com/AidenChen/vue-pagitable.git
+  git clone https://github.com/AidenChen/vue-paginator.git
 
-3. Once finished, change directory to vue-pagitable:
+3. Once finished, change directory to vue-paginator:
 
-  cd vue-pagitable
+  cd vue-paginator
 
 4. Install all dependencies:
 
