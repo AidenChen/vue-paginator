@@ -15,21 +15,21 @@
         </tr>
       </thead>
       <tbody class="paginator-demo__table-body">
-        <tr v-for="(item, index) in tableData" :key="index">
-          <td>{{item.id}}</td>
-          <td>{{item.name}}</td>
-          <td>{{item.nick}}</td>
-          <td>{{item.sign}}</td>
-          <td>{{item.platform}}</td>
-          <td>{{item.role}}</td>
-          <td>{{item.from}}</td>
-          <td>{{item.status === '1' ? 'active' : 'disabled'}}</td>
-          <td>{{item.date}}</td>
+        <tr v-for="(user, index) in users" :key="index">
+          <td>{{user.id}}</td>
+          <td>{{user.name}}</td>
+          <td>{{user.nick}}</td>
+          <td>{{user.sign}}</td>
+          <td>{{user.platform}}</td>
+          <td>{{user.role}}</td>
+          <td>{{user.from}}</td>
+          <td>{{user.status === '1' ? 'active' : 'disabled'}}</td>
+          <td>{{user.date}}</td>
         </tr>
       </tbody>
     </table>
     <div class="paginator-demo__paginator">
-      <paginator :index="index" :size="size" :total="total" :length="length" :options="options" @change-page="changePage"/>
+      <paginator :page-index="pageIndex" :page-size="pageSize" :total="total" :page-length="pageLength" :page-sizes="pageSizes" @page-changed="handlePageChanged"/>
     </div>
   </div>
 </template>
@@ -42,12 +42,12 @@ export default {
   name: 'PaginatorDemo',
   data() {
     return {
-      index: 1,
-      size: 5,
+      pageIndex: 1,
+      pageSize: 5,
       total: 0,
-      length: 5,
-      options: [10, 20, 30],
-      tableData: []
+      pageLength: 5,
+      pageSizes: [10, 20, 30],
+      users: []
     };
   },
   components: {
@@ -57,22 +57,22 @@ export default {
     this.indexUser();
   },
   methods: {
-    changePage(index, size) {
-      this.index = index;
-      this.size = size;
+    handlePageChanged(index, size) {
+      this.pageIndex = index;
+      this.pageSize = size;
       this.indexUser();
     },
     indexUser() {
       const params = {
-        _start: (this.index - 1) * this.size,
-        _limit: this.size
+        _start: (this.pageIndex - 1) * this.pageSize,
+        _limit: this.pageSize
       };
       Axios({
         method: 'GET',
         url: '/users',
         params
       }).then(res => {
-        this.tableData = res.data;
+        this.users = res.data;
         this.total = 50;
       });
     }

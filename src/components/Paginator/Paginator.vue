@@ -1,25 +1,25 @@
 <template>
   <div class="paginator">
     <ul class="paginator__pager">
-      <li class="paginator__number" :class="{'paginator__number--disabled': index === 1}" @click="prevPage()">
+      <li class="paginator__number" :class="{'paginator__number--disabled': pageIndex === 1}" @click="prevPage()">
         Previous
       </li>
-      <li class="paginator__number" v-for="(item, i) in pageList" :key="i"
-          :class="{'paginator__number--active': item === index, 'paginator__number--separated': item === '...'}" @click="changePage(item)">
-        {{item}}
+      <li class="paginator__number" v-for="(number, index) in numbers" :key="index"
+          :class="{'paginator__number--active': number === pageIndex, 'paginator__number--separated': number === '...'}" @click="changePage(number)">
+        {{number}}
       </li>
-      <li class="paginator__number" :class="{'paginator__number--disabled': index === all}" @click="nextPage()">
+      <li class="paginator__number" :class="{'paginator__number--disabled': pageIndex === pageCount}" @click="nextPage()">
         Next
       </li>
     </ul>
     <div class="paginator__comment">
       Page:
-      <input class="paginator__jumper" type="text" v-model="targetIndex" @keyup="jumpToPage($event)"/>
+      <input class="paginator__jumper" type="text" v-model="currentIndex" @keyup="jumpToPage($event)"/>
       /
-      {{all}}
+      {{pageCount}}
       ，
-      <select class="paginator__sizer" v-model="currentOption">
-        <option v-for="(option, index) in options" :key="index">{{option}}</option>
+      <select class="paginator__sizer" v-model="currentSize">
+        <option v-for="(size, index) in pageSizes" :key="index">{{size}}</option>
       </select>
       /
       {{total}}
@@ -33,28 +33,28 @@ export default {
   name: 'Paginator',
   data() {
     return {
-      // 当前输入的跳转目标页码
-      targetIndex: 0,
-      // 当前选中的每页显示的项目个数
-      currentOption: 0
+      // 跳转输入框中的当前页码
+      currentIndex: 0,
+      // 当前选中的每页显示条目个数
+      currentSize: 0
     };
   },
   props: {
     // 当前页码
-    index: {
+    pageIndex: {
       type: Number,
       default() {
         return 1;
       }
     },
-    // 每页显示的项目个数
-    size: {
+    // 每页显示条目个数
+    pageSize: {
       type: Number,
       default() {
         return 10;
       }
     },
-    // 总项目个数
+    // 总条目数
     total: {
       type: Number,
       default() {
@@ -62,14 +62,14 @@ export default {
       }
     },
     // 分页器长度，即显示的页码个数
-    length: {
+    pageLength: {
       type: Number,
       default() {
         return 5;
       }
     },
-    // 每页显示项目个数选择框的内容数组
-    options: {
+    // 每页显示条目个数选择器的选项设置
+    pageSizes: {
       type: Array,
       default() {
         return [10, 20, 30, 40, 50];
@@ -78,76 +78,79 @@ export default {
   },
   computed: {
     // 总页码数
-    all() {
-      return this.total ? Math.ceil(this.total / this.currentOption) : 1;
+    pageCount() {
+      return this.total ? Math.ceil(this.total / this.currentSize) : 1;
     },
-    // 页码数组
-    pageList() {
-      const pageList = [];
-      if (this.all <= this.length) {
-        for (let i = 1; i <= this.all; i++) {
-          pageList.push(i);
+    // 页码内容
+    numbers() {
+      const numbers = [];
+      if (this.pageCount <= this.pageLength) {
+        for (let i = 1; i <= this.pageCount; i++) {
+          numbers.push(i);
         }
-        return pageList;
+        return numbers;
       }
-      if (parseInt((this.index - 1) / this.length, 10) === 0) {
+      if (parseInt((this.pageIndex - 1) / this.pageLength, 10) === 0) {
         let i;
-        for (i = 1; i <= this.length; i++) {
-          pageList.push(i);
+        for (i = 1; i <= this.pageLength; i++) {
+          numbers.push(i);
         }
-        if (i <= this.all) {
-          pageList.push('...');
-          pageList.push(this.all);
+        if (i <= this.pageCount) {
+          numbers.push('...');
+          numbers.push(this.pageCount);
         }
-      } else if (parseInt((this.index - 1) / this.length, 10) === parseInt(this.all / this.length, 10)) {
-        if (this.index > this.length) {
-          pageList.push(1);
-          pageList.push('...');
+      } else if (parseInt((this.pageIndex - 1) / this.pageLength, 10) === parseInt(this.pageCount / this.pageLength, 10)) {
+        if (this.pageIndex > this.pageLength) {
+          numbers.push(1);
+          numbers.push('...');
         }
-        for (let i = (this.all - this.length) + 1; i <= this.all; i++) {
-          pageList.push(i);
+        for (let i = (this.pageCount - this.pageLength) + 1; i <= this.pageCount; i++) {
+          numbers.push(i);
         }
       } else {
-        if (this.index > this.length) {
-          pageList.push(1);
-          pageList.push('...');
+        if (this.pageIndex > this.pageLength) {
+          numbers.push(1);
+          numbers.push('...');
         }
         let i;
-        for (i = (parseInt((this.index - 1) / this.length, 10) * this.length) + 1; i <= (parseInt((this.index - 1) / this.length, 10) * this.length) + this.length; i++) {
-          pageList.push(i);
+        for (i = (parseInt((this.pageIndex - 1) / this.pageLength, 10) * this.pageLength) + 1; i <= (parseInt((this.pageIndex - 1) / this.pageLength, 10) * this.pageLength) + this.pageLength; i++) {
+          numbers.push(i);
         }
-        if (i <= this.all) {
-          pageList.push('...');
-          pageList.push(this.all);
+        if (i <= this.pageCount) {
+          numbers.push('...');
+          numbers.push(this.pageCount);
         }
       }
-      return pageList;
+      return numbers;
     }
   },
   watch: {
-    currentOption() {
-      this.changePage(this.index, parseInt(this.currentOption, 10));
+    currentSize(newValue, oldValue) {
+      if (!oldValue) {
+        return;
+      }
+      this.changePage(this.pageIndex, parseInt(this.currentSize, 10));
     }
   },
   created() {
-    this.fixSelect();
-    this.targetIndex = this.index;
-    this.currentOption = this.size;
+    this.fixPageSizes();
+    this.currentIndex = this.pageIndex;
+    this.currentSize = this.pageSize;
   },
   methods: {
-    // 点击页码跳转页面
+    // 跳转页面
     changePage(index, size) {
-      if (index === '...' || (index === this.index && !size)) {
+      if (index === '...' || (index === this.pageIndex && !size)) {
         return;
       }
-      const newIndex = this.fixIndex(parseInt(index, 10));
-      this.targetIndex = newIndex;
-      const newSize = size || parseInt(this.currentOption, 10);
-      this.$emit('change-page', newIndex, newSize);
+      const newIndex = this.fixPageIndex(index ? parseInt(index, 10) : 1);
+      this.currentIndex = newIndex;
+      const newSize = size || parseInt(this.currentSize, 10);
+      this.$emit('page-changed', newIndex, newSize);
     },
     // 上一页
     prevPage() {
-      let newIndex = this.index;
+      let newIndex = this.pageIndex;
       if (newIndex > 1) {
         newIndex -= 1;
       }
@@ -155,44 +158,42 @@ export default {
     },
     // 下一页
     nextPage() {
-      let newIndex = this.index;
-      if (newIndex < this.all) {
+      let newIndex = this.pageIndex;
+      if (newIndex < this.pageCount) {
         newIndex += 1;
       }
       this.changePage(newIndex);
     },
     // 输入页码跳转页面
     jumpToPage() {
-      const newIndex = this.targetIndex.toString().replace(/[^0-9]/g, '');
-      if (newIndex !== '') {
-        this.changePage(newIndex);
-      }
+      const newIndex = this.currentIndex.toString().replace(/[^0-9]/g, '');
+      this.changePage(newIndex);
     },
-    // 修正分页索引
-    fixIndex(index) {
+    // 调整页码
+    fixPageIndex(index) {
       let newIndex = index;
       if (newIndex <= 1) {
         newIndex = 1;
       }
-      if (this.all > 0 && newIndex >= this.all) {
-        newIndex = this.all;
+      if (this.pageCount > 0 && newIndex >= this.pageCount) {
+        newIndex = this.pageCount;
       }
       return newIndex;
     },
-    // 修正select框项目
-    fixSelect() {
-      const optionsLength = this.options.length;
-      let optionsStatus;
-      for (let i = 0; i < optionsLength; i++) {
-        if (parseInt(this.options[i], 10) === parseInt(this.size, 10)) {
-          optionsStatus = true;
+    // 调整每页显示条目个数选择器的选项
+    fixPageSizes() {
+      const pageSizesLength = this.pageSizes.length;
+      let pageSizesStatus;
+      for (let i = 0; i < pageSizesLength; i++) {
+        if (parseInt(this.pageSizes[i], 10) === parseInt(this.pageSize, 10)) {
+          pageSizesStatus = true;
           break;
         }
       }
-      if (!optionsStatus) {
-        this.options.push(this.size);
+      if (!pageSizesStatus) {
+        this.pageSizes.push(this.pageSize);
       }
-      this.options.sort((x, y) => x - y);
+      this.pageSizes.sort((x, y) => x - y);
     }
   }
 };
