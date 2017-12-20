@@ -1,24 +1,24 @@
 <template>
-  <div class="paginator-wrapper">
-    <ul class="paginator">
-      <li class="paginator__item" :class="{'paginator__item--disabled': index === 1}" @click="prevPage()">
-        <span class="paginator__page-no">Previous</span>
+  <div class="paginator">
+    <ul class="paginator__pager">
+      <li class="paginator__number" :class="{'paginator__number--disabled': index === 1}" @click="prevPage()">
+        Previous
       </li>
-      <li class="paginator__item" v-for="(item, i) in pageList" :key="i"
-          :class="{'paginator__item--active': item === index, 'paginator__item--separated': item === '...'}" @click="changePage(item)">
-        <span class="paginator__page-no">{{item}}</span>
+      <li class="paginator__number" v-for="(item, i) in pageList" :key="i"
+          :class="{'paginator__number--active': item === index, 'paginator__number--separated': item === '...'}" @click="changePage(item)">
+        {{item}}
       </li>
-      <li class="paginator__item" :class="{'paginator__item--disabled': index === all}" @click="nextPage()">
-        <span class="paginator__page-no">Next</span>
+      <li class="paginator__number" :class="{'paginator__number--disabled': index === all}" @click="nextPage()">
+        Next
       </li>
     </ul>
     <div class="paginator__comment">
       Page:
-      <input class="paginator__page-jumper" type="text" v-model="targetIndex" @keyup="jumpToPage($event)"/>
+      <input class="paginator__jumper" type="text" v-model="targetIndex" @keyup="jumpToPage($event)"/>
       /
       {{all}}
       ，
-      <select class="paginator__page-sizer" v-model="optionNow">
+      <select class="paginator__sizer" v-model="currentOption">
         <option v-for="(option, index) in options" :key="index">{{option}}</option>
       </select>
       /
@@ -36,10 +36,17 @@ export default {
       // 当前输入的跳转目标页码
       targetIndex: 0,
       // 当前选中的每页显示的项目个数
-      optionNow: 0
+      currentOption: 0
     };
   },
   props: {
+    // 当前页码
+    index: {
+      type: Number,
+      default() {
+        return 1;
+      }
+    },
     // 每页显示的项目个数
     size: {
       type: Number,
@@ -54,13 +61,6 @@ export default {
         return 0;
       }
     },
-    // 每页显示项目个数select的内容数组
-    options: {
-      type: Array,
-      default() {
-        return [10, 20, 30, 40, 50];
-      }
-    },
     // 分页器长度，即显示的页码个数
     length: {
       type: Number,
@@ -68,18 +68,18 @@ export default {
         return 5;
       }
     },
-    // 当前页码
-    index: {
-      type: Number,
+    // 每页显示项目个数选择框的内容数组
+    options: {
+      type: Array,
       default() {
-        return 1;
+        return [10, 20, 30, 40, 50];
       }
     }
   },
   computed: {
     // 总页码数
     all() {
-      return this.total ? Math.ceil(this.total / this.optionNow) : 1;
+      return this.total ? Math.ceil(this.total / this.currentOption) : 1;
     },
     // 页码数组
     pageList() {
@@ -125,14 +125,14 @@ export default {
     }
   },
   watch: {
-    optionNow() {
+    currentOption() {
       const newIndex = this.init(this.index);
-      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
+      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
     }
   },
   created() {
     this.targetIndex = this.init(this.index);
-    this.optionNow = this.size;
+    this.currentOption = this.size;
   },
   methods: {
     // 初始化
@@ -147,7 +147,7 @@ export default {
         return;
       }
       const newIndex = this.fixIndex(parseInt(index, 10));
-      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
+      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
     },
     // 上一页
     prevPage() {
@@ -159,7 +159,7 @@ export default {
         newIndex -= 1;
       }
       this.targetIndex = newIndex;
-      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
+      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
     },
     // 下一页
     nextPage() {
@@ -171,7 +171,7 @@ export default {
         newIndex += 1;
       }
       this.targetIndex = newIndex;
-      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
+      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
     },
     // 输入页码跳转页面
     jumpToPage() {
@@ -212,7 +212,7 @@ export default {
 </script>
 
 <style lang="scss">
-.paginator-wrapper:after {
+.paginator:after {
   content: ' ';
   display: block;
   height: 0;
@@ -220,17 +220,14 @@ export default {
   visibility: hidden;
 }
 
-.paginator {
+.paginator__pager {
   float: left;
   margin-top: 0;
   font-size: 0;
 }
 
-.paginator__item {
+.paginator__number {
   display: inline-block;
-}
-
-.paginator__page-no {
   position: relative;
   float: left;
   box-sizing: border-box;
@@ -243,40 +240,40 @@ export default {
   line-height: 16px;
 }
 
-.paginator__item:first-child .paginator__page-no {
+.paginator__number:first-child {
   margin-left: 0;
 }
 
-.paginator__item .paginator__page-no:hover {
+.paginator__number:hover {
   color: #4f99c6;
 }
 
-.paginator__item--separated .paginator__page-no {
+.paginator__number--separated {
   cursor: default;
   padding-left: 8px;
   padding-right: 8px;
 }
 
-.paginator__item--separated .paginator__page-no:hover {
+.paginator__number--separated:hover {
   background: none;
 }
 
-.paginator__item--active .paginator__page-no {
+.paginator__number--active {
   background-color: #4f99c6;
   border-color: #4f99c6;
   color: #fff;
 }
 
-.paginator__item--active .paginator__page-no:hover {
+.paginator__number--active:hover {
   color: #fff;
 }
 
-.paginator__item--disabled .paginator__page-no {
+.paginator__number--disabled {
   cursor: not-allowed;
   color: #777;
 }
 
-.paginator__item--disabled .paginator__page-no:hover {
+.paginator__number--disabled:hover {
   color: #777;
 }
 
@@ -288,8 +285,8 @@ export default {
   line-height: 30px;
 }
 
-.paginator__page-jumper,
-.paginator__page-sizer {
+.paginator__jumper,
+.paginator__sizer {
   margin: 0;
   width: 40px;
   height: 30px;
@@ -299,7 +296,7 @@ export default {
   outline: none;
 }
 
-.paginator__page-jumper {
+.paginator__jumper {
   padding-left: 3px;
 }
 </style>
