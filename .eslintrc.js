@@ -53,6 +53,9 @@ module.exports = {
     'no-bitwise': ['error', {
       'allow': ['~']
     }],
+    'max-len': ['error', {
+      'code': 200
+    }],
     'linebreak-style': 'off',
   }
 }

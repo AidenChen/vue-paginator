@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody class="paginator-demo__table-body">
-        <tr v-for="item in tableData">
+        <tr v-for="(item, index) in tableData" :key="index">
           <td>{{item.id}}</td>
           <td>{{item.name}}</td>
           <td>{{item.nick}}</td>

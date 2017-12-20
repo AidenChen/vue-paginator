@@ -1,6 +1,6 @@
 <template>
   <div class="paginator-wrapper">
-    <ul class="paginator" v-show="total > 0">
+    <ul class="paginator">
       <li class="paginator__item" :class="{'paginator__item--disabled': index === 1}" @click="prevPage()">
         <span class="paginator__page-no">Previous</span>
       </li>
@@ -12,7 +12,7 @@
         <span class="paginator__page-no">Next</span>
       </li>
     </ul>
-    <div class="paginator__comment" v-show="total > 0">
+    <div class="paginator__comment">
       Page:
       <input class="paginator__page-jumper" type="text" v-model="targetIndex" @keyup="jumpToPage($event)"/>
       /
@@ -25,7 +25,6 @@
       {{total}}
       items
     </div>
-    <div class="paginator__comment--clear" v-show="total === 0">No data.</div>
   </div>
 </template>
 
@@ -80,46 +79,44 @@ export default {
   computed: {
     // 总页码数
     all() {
-      return Math.ceil(this.total / this.optionNow);
+      return this.total ? Math.ceil(this.total / this.optionNow) : 1;
     },
     // 页码数组
     pageList() {
       const pageList = [];
-      // 若总页数不超过分页器长度，则直接显示
       if (this.all <= this.length) {
         for (let i = 1; i <= this.all; i++) {
           pageList.push(i);
         }
+        return pageList;
+      }
+      if (parseInt((this.index - 1) / this.length, 10) === 0) {
+        let i;
+        for (i = 1; i <= this.length; i++) {
+          pageList.push(i);
+        }
+        if (i <= this.all) {
+          pageList.push('...');
+          pageList.push(this.all);
+        }
+      } else if (parseInt((this.index - 1) / this.length, 10) === parseInt(this.all / this.length, 10)) {
+        if (this.index > this.length) {
+          pageList.push(1);
+          pageList.push('...');
+        }
+        for (let i = (this.all - this.length) + 1; i <= this.all; i++) {
+          pageList.push(i);
+        }
       } else {
-        // 若总页数超过分页器长度，则分为三种情况
-        // 左右两边偏移显示页码的个数
-        const offset = (this.length - 1) / 2;
-        // 若页码值少于左侧偏移显示页码的个数代表的阈值，则表示左侧偏移，右侧显示省略号
-        if (this.index <= offset) {
-          for (let i = 1; i <= offset + 1; i++) {
-            pageList.push(i);
-          }
-          pageList.push('...');
-          pageList.push(this.all);
-        } else if (this.index > this.all - offset) {
-          // 若页码值大于右侧偏移显示页码的个数代表的阈值，则表示右侧偏移，左侧显示省略号
+        if (this.index > this.length) {
           pageList.push(1);
           pageList.push('...');
-          for (let i = offset + 1; i >= 1; i--) {
-            pageList.push(this.all - i);
-          }
-          pageList.push(this.all);
-        } else {
-          // 若页码值处于两侧偏移显示页码区域之间，则两侧均显示省略号
-          pageList.push(1);
-          pageList.push('...');
-          for (let i = Math.ceil(offset / 2); i >= 1; i--) {
-            pageList.push(this.index - i);
-          }
-          pageList.push(this.index);
-          for (let i = 1; i <= offset / 2; i++) {
-            pageList.push(this.index + i);
-          }
+        }
+        let i;
+        for (i = (parseInt((this.index - 1) / this.length, 10) * this.length) + 1; i <= (parseInt((this.index - 1) / this.length, 10) * this.length) + this.length; i++) {
+          pageList.push(i);
+        }
+        if (i <= this.all) {
           pageList.push('...');
           pageList.push(this.all);
         }
@@ -129,70 +126,71 @@ export default {
   },
   watch: {
     optionNow() {
-      this.init();
-      this.$emit('change-page', this.index, parseInt(this.optionNow, 10));
+      const newIndex = this.init(this.index);
+      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
     }
   },
   created() {
-    this.targetIndex = this.index;
+    this.targetIndex = this.init(this.index);
     this.optionNow = this.size;
-    this.init();
   },
   methods: {
     // 初始化
-    init() {
-      this.fixLength();
-      this.fixIndex();
+    init(index) {
+      const newIndex = this.fixIndex(index);
       this.fixSelect();
+      return newIndex;
     },
     // 点击页码跳转页面
     changePage(index) {
-      if (index === '...') {
+      if (index === '...' || index === this.index) {
         return;
       }
-      this.index = parseInt(index, 10);
-      this.fixIndex();
-      this.$emit('change-page', this.index, parseInt(this.optionNow, 10));
+      const newIndex = this.fixIndex(parseInt(index, 10));
+      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
     },
     // 上一页
     prevPage() {
-      if (this.index > 1) {
-        this.index -= 1;
+      let newIndex = this.index;
+      if (newIndex === 1) {
+        return;
       }
-      this.targetIndex = this.index;
-      this.$emit('change-page', this.index, parseInt(this.optionNow, 10));
+      if (newIndex > 1) {
+        newIndex -= 1;
+      }
+      this.targetIndex = newIndex;
+      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
     },
     // 下一页
     nextPage() {
-      if (this.index < this.all) {
-        this.index += 1;
+      let newIndex = this.index;
+      if (newIndex === this.all) {
+        return;
       }
-      this.targetIndex = this.index;
-      this.$emit('change-page', this.index, parseInt(this.optionNow, 10));
+      if (newIndex < this.all) {
+        newIndex += 1;
+      }
+      this.targetIndex = newIndex;
+      this.$emit('change-page', newIndex, parseInt(this.optionNow, 10));
     },
     // 输入页码跳转页面
     jumpToPage() {
-      this.targetIndex = this.targetIndex.replace(/[^0-9]/g, '');
+      this.targetIndex = this.targetIndex.toString().replace(/[^0-9]/g, '');
       if (this.targetIndex !== '') {
         this.changePage(this.targetIndex);
       }
     },
-    // 修正分页器显示的页码个数
-    fixLength() {
-      this.length = parseInt(this.length, 10) ? parseInt(this.length, 10) : 5;
-      if (this.length % 2 === 0) {
-        this.length += 1;
-      }
-    },
     // 修正分页索引
-    fixIndex() {
-      if (this.index < 1) {
-        this.index = 1;
+    fixIndex(index) {
+      let newIndex = index;
+      if (newIndex < 1) {
+        newIndex = 1;
       }
-      if (this.all > 0 && this.index > this.all) {
-        this.index = this.all;
+      if (this.all > 0 && newIndex > this.all) {
+        newIndex = this.all;
       }
-      this.targetIndex = this.index;
+      this.targetIndex = newIndex;
+      return newIndex;
     },
     // 修正select框项目
     fixSelect() {
@@ -303,11 +301,5 @@ export default {
 
 .paginator__page-jumper {
   padding-left: 3px;
-}
-
-.paginator__comment--clear {
-  height: 30px;
-  font-size: 12px;
-  line-height: 30px;
 }
 </style>
