@@ -1,29 +1,33 @@
 <template>
   <div class="paginator">
+    <div class="paginator__comment paginator__total">
+      共
+      {{total}}
+      条
+    </div>
+    <div class="paginator__comment paginator__sizer">
+      每页
+      <select v-model="currentSize">
+        <option v-for="(size, index) in pageSizes" :key="index">{{size}}</option>
+      </select>
+      条
+    </div>
     <ul class="paginator__pager">
       <li class="paginator__number" :class="{'paginator__number--disabled': pageIndex === 1}" @click="prevPage()">
-        Previous
+        &lt;
       </li>
       <li class="paginator__number" v-for="(number, index) in numbers" :key="index"
           :class="{'paginator__number--active': number === pageIndex, 'paginator__number--separated': number === '...'}" @click="changePage(number)">
         {{number}}
       </li>
       <li class="paginator__number" :class="{'paginator__number--disabled': pageIndex === pageCount}" @click="nextPage()">
-        Next
+        &gt;
       </li>
     </ul>
-    <div class="paginator__comment">
-      Page:
-      <input class="paginator__jumper" type="text" v-model="currentIndex" @keyup="jumpToPage($event)"/>
-      /
-      {{pageCount}}
-      ，
-      <select class="paginator__sizer" v-model="currentSize">
-        <option v-for="(size, index) in pageSizes" :key="index">{{size}}</option>
-      </select>
-      /
-      {{total}}
-      items
+    <div class="paginator__comment paginator__jumper">
+      前往
+      <input type="text" v-model="currentIndex" @keyup="jumpToPage($event)"/>
+      页
     </div>
   </div>
 </template>
@@ -208,9 +212,14 @@ export default {
   visibility: hidden;
 }
 
+.paginator__total {
+  margin-right: 10px;
+}
+
 .paginator__pager {
   float: left;
-  margin-top: 0;
+  margin: 0 10px 0;
+  padding: 0;
   font-size: 0;
 }
 
@@ -224,7 +233,7 @@ export default {
   cursor: pointer;
   border: 1px solid #ddd;
   color: #4f99c6;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 16px;
 }
 
@@ -267,14 +276,13 @@ export default {
 
 .paginator__comment {
   float: left;
-  margin-left: 20px;
   height: 30px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 30px;
 }
 
-.paginator__jumper,
-.paginator__sizer {
+.paginator__jumper input,
+.paginator__sizer select {
   margin: 0;
   width: 40px;
   height: 30px;
@@ -284,7 +292,7 @@ export default {
   outline: none;
 }
 
-.paginator__jumper {
+.paginator__jumper input {
   padding-left: 3px;
 }
 </style>
