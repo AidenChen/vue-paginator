@@ -126,70 +126,57 @@ export default {
   },
   watch: {
     currentOption() {
-      const newIndex = this.init(this.index);
-      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
+      this.changePage(this.index, parseInt(this.currentOption, 10));
     }
   },
   created() {
-    this.targetIndex = this.init(this.index);
+    this.fixSelect();
+    this.targetIndex = this.index;
     this.currentOption = this.size;
   },
   methods: {
-    // 初始化
-    init(index) {
-      const newIndex = this.fixIndex(index);
-      this.fixSelect();
-      return newIndex;
-    },
     // 点击页码跳转页面
-    changePage(index) {
-      if (index === '...' || index === this.index) {
+    changePage(index, size) {
+      if (index === '...' || (index === this.index && !size)) {
         return;
       }
       const newIndex = this.fixIndex(parseInt(index, 10));
-      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
+      this.targetIndex = newIndex;
+      const newSize = size || parseInt(this.currentOption, 10);
+      this.$emit('change-page', newIndex, newSize);
     },
     // 上一页
     prevPage() {
       let newIndex = this.index;
-      if (newIndex === 1) {
-        return;
-      }
       if (newIndex > 1) {
         newIndex -= 1;
       }
-      this.targetIndex = newIndex;
-      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
+      this.changePage(newIndex);
     },
     // 下一页
     nextPage() {
       let newIndex = this.index;
-      if (newIndex === this.all) {
-        return;
-      }
       if (newIndex < this.all) {
         newIndex += 1;
       }
-      this.targetIndex = newIndex;
-      this.$emit('change-page', newIndex, parseInt(this.currentOption, 10));
+      this.changePage(newIndex);
     },
     // 输入页码跳转页面
     jumpToPage() {
-      this.targetIndex = this.targetIndex.toString().replace(/[^0-9]/g, '');
-      if (this.targetIndex !== '') {
-        this.changePage(this.targetIndex);
+      const newIndex = this.targetIndex.toString().replace(/[^0-9]/g, '');
+      if (newIndex !== '') {
+        this.changePage(newIndex);
       }
     },
     // 修正分页索引
     fixIndex(index) {
       let newIndex = index;
-      if (newIndex < 1) {
+      if (newIndex <= 1) {
         newIndex = 1;
       }
-      if (this.all > 0 && newIndex > this.all) {
+      if (this.all > 0 && newIndex >= this.all) {
         newIndex = this.all;
       }
-      this.targetIndex = newIndex;
       return newIndex;
     },
     // 修正select框项目
