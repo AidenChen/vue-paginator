@@ -107,36 +107,32 @@ export default {
         }
         return numbers;
       }
-      if (parseInt((this.pageIndex - 1) / this.pageLength, 10) === 0) {
-        let i;
-        for (i = 1; i <= this.pageLength; i++) {
+      const pageLength = (this.pageLength % 2 === 0) ? this.pageLength - 1 : this.pageLength;
+      const offset = (pageLength - 1) / 2;
+      if (this.pageIndex <= pageLength - 1) {
+        for (let i = 1; i <= pageLength; i++) {
           numbers.push(i);
         }
-        if (i <= this.pageCount) {
-          numbers.push('...');
-          numbers.push(this.pageCount);
-        }
-      } else if (parseInt((this.pageIndex - 1) / this.pageLength, 10) === parseInt(this.pageCount / this.pageLength, 10)) {
-        if (this.pageIndex > this.pageLength) {
-          numbers.push(1);
-          numbers.push('...');
-        }
-        for (let i = (this.pageCount - this.pageLength) + 1; i <= this.pageCount; i++) {
+        numbers.push('...');
+        numbers.push(this.pageCount);
+      } else if (this.pageIndex > this.pageCount - (pageLength - 1)) {
+        numbers.push(1);
+        numbers.push('...');
+        for (let i = (this.pageCount - pageLength) + 1; i <= this.pageCount; i++) {
           numbers.push(i);
         }
       } else {
-        if (this.pageIndex > this.pageLength) {
-          numbers.push(1);
-          numbers.push('...');
-        }
-        let i;
-        for (i = (parseInt((this.pageIndex - 1) / this.pageLength, 10) * this.pageLength) + 1; i <= (parseInt((this.pageIndex - 1) / this.pageLength, 10) * this.pageLength) + this.pageLength; i++) {
+        numbers.push(1);
+        numbers.push('...');
+        for (let i = this.pageIndex - offset; i < this.pageIndex; i++) {
           numbers.push(i);
         }
-        if (i <= this.pageCount) {
-          numbers.push('...');
-          numbers.push(this.pageCount);
+        numbers.push(this.pageIndex);
+        for (let i = this.pageIndex + 1; i <= this.pageIndex + offset; i++) {
+          numbers.push(i);
         }
+        numbers.push('...');
+        numbers.push(this.pageCount);
       }
       return numbers;
     }
