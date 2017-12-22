@@ -14,9 +14,18 @@
 
 ``` html
 <template>
-  <paginator :total="total" @change-page="changePage"/>
-  <paginator :index="index" :size="size" :total="total" @change-page="changePage"/>
-  <paginator :index="index" :size="size" :total="total" :length="length" :options="options" @change-page="changePage"/>
+  <paginator :total="total" @page-changed="handlePageChanged"/>
+  <paginator :page-index="pageIndex" :page-size="pageSize" :total="total" @page-changed="handlePageChanged"/>
+  <paginator
+    :page-index="pageIndex"
+    :page-size="pageSize"
+    :total="total"
+    :pager-length="pagerLength"
+    :page-sizes="pageSizes"
+    :layout="'total, sizer, pager, jumper'"
+    :background="false"
+    @page-changed="handlePageChanged"
+  />
 </template>
 
 <script>
@@ -25,12 +34,12 @@
   export default {
     data() {
       return {
-        index: 1,
-        size: 5,
+        pageIndex: 1,
+        pageSize: 5,
         total: 0,
-        length: 5,
-        options: [10, 20, 30],
-        tableData: []
+        pagerLength: 3,
+        pageSizes: [10, 20, 30],
+        users: []
       };
     },
     components: {
@@ -40,14 +49,15 @@
       this.indexUser();
     },
     methods: {
-      changePage(index, size) {
-        this.index = index;
-        this.size = size;
+      handlePageChanged(index, size) {
+        this.pageIndex = index;
+        this.pageSize = size;
         this.indexUser();
       },
       indexUser() {
-        // Fetch data with this.index and this.size
-        // Don't forget to update this.total
+        ...
+        this.users = res.data.data.items;
+        this.total = res.data.data.total;
       }
     }
   }
@@ -56,23 +66,32 @@
 
 # Run
 
-1. Open your terminal.
+1. 打开终端
 
-2. Clone this repo:
+2. 克隆本仓库
 
-  git clone https://github.com/AidenChen/vue-paginator.git
+``` 
+git clone https://github.com/AidenChen/vue-paginator.git
+```
 
-3. Once finished, change directory to vue-paginator:
+3. 进入目录
 
-  cd vue-paginator
+``` 
+cd vue-paginator
+```
 
-4. Install all dependencies:
+4. 安装依赖
 
-  npm install
+``` 
+npm install
+```
 
-5. Run the demo:
+5. 运行
 
-  npm run dev
+``` 
+npm run serve
+npm run dev
+```
 
 # License
 
