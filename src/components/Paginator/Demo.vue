@@ -33,7 +33,7 @@
         :page-index="pageIndex"
         :page-size="pageSize"
         :total="total"
-        :page-length="pageLength"
+        :pager-length="pagerLength"
         :page-sizes="pageSizes"
         :layout="'pager'"
         :background="false"
@@ -54,7 +54,7 @@ export default {
       pageIndex: 1,
       pageSize: 5,
       total: 0,
-      pageLength: 5,
+      pagerLength: 3,
       pageSizes: [10, 20, 30],
       users: []
     };

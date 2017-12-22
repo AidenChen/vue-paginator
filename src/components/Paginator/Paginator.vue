@@ -66,7 +66,7 @@ export default {
       }
     },
     // 分页器长度，即显示的页码个数
-    pageLength: {
+    pagerLength: {
       type: Number,
       default() {
         return 5;
@@ -86,6 +86,7 @@ export default {
         return 'total, sizer, pager, jumper';
       }
     },
+    // 是否为分页按钮添加背景色
     background: {
       type: Boolean,
       default() {
@@ -101,29 +102,31 @@ export default {
     // 页码内容
     numbers() {
       const numbers = [];
-      if (this.pageCount <= this.pageLength) {
+      if (this.pageCount <= this.pagerLength) {
         for (let i = 1; i <= this.pageCount; i++) {
           numbers.push(i);
         }
         return numbers;
       }
-      const pageLength = (this.pageLength % 2 === 0) ? this.pageLength - 1 : this.pageLength;
-      const offset = (pageLength - 1) / 2;
-      if (this.pageIndex <= pageLength - 1) {
-        for (let i = 1; i <= pageLength; i++) {
+      const pagerLength = (this.pagerLength % 2 === 0) ? this.pagerLength - 1 : this.pagerLength;
+      const offset = (pagerLength - 1) / 2;
+      if (this.pageIndex <= pagerLength) {
+        for (let i = 1; i <= pagerLength + 1; i++) {
           numbers.push(i);
         }
         numbers.push('...');
         numbers.push(this.pageCount);
-      } else if (this.pageIndex > this.pageCount - (pageLength - 1)) {
+      } else if (this.pageIndex > this.pageCount - pagerLength) {
         numbers.push(1);
         numbers.push('...');
-        for (let i = (this.pageCount - pageLength) + 1; i <= this.pageCount; i++) {
+        for (let i = this.pageCount - pagerLength; i <= this.pageCount; i++) {
           numbers.push(i);
         }
       } else {
         numbers.push(1);
-        numbers.push('...');
+        if (this.pageIndex - 1 > 1) {
+          numbers.push('...');
+        }
         for (let i = this.pageIndex - offset; i < this.pageIndex; i++) {
           numbers.push(i);
         }
@@ -131,7 +134,9 @@ export default {
         for (let i = this.pageIndex + 1; i <= this.pageIndex + offset; i++) {
           numbers.push(i);
         }
-        numbers.push('...');
+        if (this.pageIndex + 1 < this.pageCount) {
+          numbers.push('...');
+        }
         numbers.push(this.pageCount);
       }
       return numbers;
