@@ -29,7 +29,16 @@
       </tbody>
     </table>
     <div class="paginator-demo__paginator">
-      <paginator :page-index="pageIndex" :page-size="pageSize" :total="total" :page-length="pageLength" :page-sizes="pageSizes" @page-changed="handlePageChanged"/>
+      <paginator
+        :page-index="pageIndex"
+        :page-size="pageSize"
+        :total="total"
+        :page-length="pageLength"
+        :page-sizes="pageSizes"
+        :layout="'pager'"
+        :background="false"
+        @page-changed="handlePageChanged"
+      />
     </div>
   </div>
 </template>

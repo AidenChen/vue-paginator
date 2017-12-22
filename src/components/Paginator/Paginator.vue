@@ -1,18 +1,18 @@
 <template>
   <div class="paginator">
-    <div class="paginator__comment paginator__total">
+    <div class="paginator__comment paginator__total" v-if="layout.indexOf('total') !== -1">
       共
       {{total}}
       条
     </div>
-    <div class="paginator__comment paginator__sizer">
+    <div class="paginator__comment paginator__sizer" v-if="layout.indexOf('sizer') !== -1">
       每页
       <select v-model="currentSize">
         <option v-for="(size, index) in pageSizes" :key="index">{{size}}</option>
       </select>
       条
     </div>
-    <ul class="paginator__pager">
+    <ul class="paginator__pager" :class="{'paginator__pager--background': background}">
       <li class="paginator__number" :class="{'paginator__number--disabled': pageIndex === 1}" @click="prevPage()">
         &lt;
       </li>
@@ -24,7 +24,7 @@
         &gt;
       </li>
     </ul>
-    <div class="paginator__comment paginator__jumper">
+    <div class="paginator__comment paginator__jumper" v-if="layout.indexOf('jumper') !== -1">
       前往
       <input type="text" v-model="currentIndex" @keyup="jumpToPage($event)"/>
       页
@@ -77,6 +77,19 @@ export default {
       type: Array,
       default() {
         return [10, 20, 30, 40, 50];
+      }
+    },
+    // 组件布局
+    layout: {
+      type: String,
+      default() {
+        return 'total, sizer, pager, jumper';
+      }
+    },
+    background: {
+      type: Boolean,
+      default() {
+        return false;
       }
     }
   },
@@ -204,6 +217,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../../assets/scss/base.scss';
+
 .paginator:after {
   content: ' ';
   display: block;
@@ -223,6 +238,20 @@ export default {
   font-size: 0;
 }
 
+.paginator__pager--background {
+  .paginator__number {
+    border: 1px solid #dddddd;
+  }
+  .paginator__number--active {
+    background-color: $color-blue;
+    border-color: $color-blue;
+    color: #ffffff;
+  }
+  .paginator__number--active:hover {
+    color: #ffffff;
+  }
+}
+
 .paginator__number {
   display: inline-block;
   position: relative;
@@ -231,9 +260,8 @@ export default {
   padding: 6px 12px;
   margin-left: -1px;
   cursor: pointer;
-  border: 1px solid #ddd;
-  color: #4f99c6;
-  font-size: 14px;
+  color: $color-black;
+  font-size: $size-normal;
   line-height: 16px;
 }
 
@@ -242,7 +270,7 @@ export default {
 }
 
 .paginator__number:hover {
-  color: #4f99c6;
+  color: $color-blue;
 }
 
 .paginator__number--separated {
@@ -252,32 +280,32 @@ export default {
 }
 
 .paginator__number--separated:hover {
+  color: $color-black;
   background: none;
 }
 
 .paginator__number--active {
-  background-color: #4f99c6;
-  border-color: #4f99c6;
-  color: #fff;
+  cursor: default;
+  color: $color-blue;
 }
 
 .paginator__number--active:hover {
-  color: #fff;
+  color: $color-blue;
 }
 
 .paginator__number--disabled {
   cursor: not-allowed;
-  color: #777;
+  color: #777777;
 }
 
 .paginator__number--disabled:hover {
-  color: #777;
+  color: #777777;
 }
 
 .paginator__comment {
   float: left;
   height: 30px;
-  font-size: 14px;
+  font-size: $size-normal;
   line-height: 30px;
 }
 
@@ -288,7 +316,7 @@ export default {
   height: 30px;
   box-sizing: border-box;
   vertical-align: top;
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   outline: none;
 }
 
